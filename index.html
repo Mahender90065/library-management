@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech For Girls Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #ffe5f7, #f8f9fa);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      color: #d63384;
+    }
+    label {
+      margin-top: 1rem;
+      font-weight: 600;
+      display: block;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-top: 0.3rem;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 5px #d63384;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+    }
+    #whatsappBtn {
+      background: #25D366;
+      color: white;
+    }
+    #submitBtn {
+      background: #d63384;
+      color: white;
+    }
+    #submitBtn:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    #thankYouMsg {
+      text-align: center;
+      color: green;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    #shareCountDisplay {
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Register Now</h1>
+    <form id="regForm" enctype="multipart/form-data">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="phone">Phone Number</label>
+      <input type="text" id="phone" name="phone" pattern="\d{10}" maxlength="10" required title="Please enter a 10-digit phone number" />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" pattern=".+@gmail\.com" required title="Email must end with @gmail.com" />
+
+      <label for="college">College/Department</label>
+      <input type="text" id="college" name="college" required />
+
+      <label for="screenshot">Upload Screenshot</label>
+      <input type="file" id="screenshot" name="screenshot" accept="image/*" required />
+
+      <button type="button" id="whatsappBtn">Share on WhatsApp</button>
+      <p id="shareCountDisplay">Click count: 0/5</p>
+
+      <button type="submit" id="submitBtn" disabled>Submit Registration</button>
+      <p id="thankYouMsg" style="display:none;">🎉 Successfully registered. Thanks for being part of Tech for Girls!</p>
+    </form>
+  </div>
+
+  <script>
+    let shareCount = 0;
+    const whatsappBtn = document.getElementById("whatsappBtn");
+    const shareCountDisplay = document.getElementById("shareCountDisplay");
+    const submitBtn = document.getElementById("submitBtn");
+    const regForm = document.getElementById("regForm");
+    const thankYouMsg = document.getElementById("thankYouMsg");
+
+    function updateShareText() {
+      if (shareCount >= 5) {
+        shareCountDisplay.innerText = `Click count: 5/5 — Sharing complete. Please continue.`;
+        submitBtn.disabled = false;
+      } else {
+        shareCountDisplay.innerText = `Click count: ${shareCount}/5`;
+        submitBtn.disabled = true;
+      }
+    }
+
+    updateShareText();
+
+    whatsappBtn.addEventListener("click", () => {
+      const message = encodeURIComponent("Hey Buddy, Join Tech For Girls Community");
+      const url = `https://wa.me/?text=${message}`;
+      window.open(url, '_blank');
+      if (shareCount < 5) {
+        shareCount++;
+        updateShareText();
+      }
+    });
+
+    regForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      submitBtn.disabled = true;
+
+      const formData = new FormData(regForm);
+      const url = "https://script.google.com/macros/s/AKfycbxJ1ITV3nXFw7QWw7XLgjRX7hJDahlHuyY8PLtT5cb5ebfVH43mgf2Diy6qjgwI2KuLMg/exec";
+
+      try {
+        const res = await fetch(url, { method: "POST", body: formData });
+        if (res.ok) {
+          regForm.querySelectorAll("input, button").forEach(el => el.disabled = true);
+          thankYouMsg.textContent = "🎉 Successfully registered. Thanks for being part of Tech for Girls!";
+          thankYouMsg.style.display = "block";
+          localStorage.setItem("formSubmitted", "true");
+        } else {
+          alert("Submission failed. Try again later.");
+          submitBtn.disabled = false;
+        }
+      } catch (err) {
+        alert("Error: " + err);
+        submitBtn.disabled = false;
+      }
+    });
+
+    if (localStorage.getItem("formSubmitted") === "true") {
+      regForm.querySelectorAll("input, button").forEach(el => el.disabled = true);
+      thankYouMsg.style.display = "block";
+    }
+  </script>
+</body>
+</html>
